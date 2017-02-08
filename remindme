@@ -1,0 +1,84 @@
+#!/bin/bash
+
+#                 __           __  
+#     _________  / /___ ______/ /_ 
+#    / ___/ __ \/ / __ `/ ___/ __ \
+#   (__  ) /_/ / / /_/ (__  ) / / /
+#  /____/ .___/_/\__,_/____/_/ /_/ 
+#      /_/                        
+#
+#  * @Version 	= 	1.0.0
+#  * @date 		= 	09/02/2017
+#  * @author	=	Niyat Patel (Splash)
+#
+
+# install at if not already installed
+if ! (dpkg -s at > /dev/null 2>&1) > 0; 
+then 
+	sudo apt-get install at > /dev/null 2>&1
+fi
+
+# get last occurance of the given string
+getlastindex() { 
+  x="${1%$2*}"
+  [[ $x = $1 ]] && echo -1 || echo ${#x}
+}
+
+#send notification based on scenerios: at or after
+sendnotification() {
+	notification=${input%$1*}; # Before at
+	_time_=${input##* $1 }; # time
+
+	[[ $1 = at ]] && settime=$_time_ || settime="now+"$_time_;
+
+	{
+		at $settime > /dev/null 2>&1 <<EOF
+		notify-send -u Reminder '$notification';
+EOF
+	} || {
+		echo usage;
+		exit 1;
+	}
+	echo "Keep working... I will remind you "$input;
+	exit 1;	
+}
+
+usage(){
+	echo "Usage: Set reminder of your task just in moment!";
+	echo "";
+	echo "Try something like following:";
+	echo "-----------------------------"
+	echo "    remindme To send mail to Niyat at 5pm";
+	echo "    remindme to drint water after 30 mins";
+	echo "    remindme to update ubuntu at 12.10 am";
+	echo "    remindme To drink coffee after 5 minutes";
+}
+input=$*;
+
+if [[ ($* == "" || $* == "-h" || $* == "--help") ]]; then
+	usage;
+	exit 1;
+fi
+
+# String containing both at and after then take last at or after for time
+if [[ ($input == *" at "* || $input == "at"*) &&  ($input == *" after "* || $input == "after"*)  ]]; then
+	#handle here
+	after_index=$(getlastindex "$input" after);
+	at_index=$(getlastindex "$input" at);
+
+	if [[ $at_index -gt $after_index ]]; then # at is the latest 
+		sendnotification at;
+	  else # after is the latest
+		sendnotification after;
+	fi
+
+  else
+
+	case $input in
+		*" after "* ) sendnotification after;
+			;;
+		*" at "* ) sendnotification at;
+			;;
+	esac
+	usage;
+fi
