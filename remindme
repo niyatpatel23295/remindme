@@ -33,14 +33,14 @@ sendnotification() {
 
 	{
 		at $settime > /dev/null 2>&1 <<EOF
-		notify-send -u Reminder '$notification';
+		notify-send Reminder '$notification';
 EOF
 	} || {
 		echo usage;
-		exit 1;
+		exit 0;
 	}
 	echo "Keep working... I will remind you "$input;
-	exit 1;	
+	exit 0;	
 }
 
 usage(){
@@ -49,7 +49,7 @@ usage(){
 	echo "Try something like following:";
 	echo "-----------------------------"
 	echo "    remindme To send mail to Niyat at 5pm";
-	echo "    remindme to drint water after 30 mins";
+	echo "    remindme to drint water after 30 minutes";
 	echo "    remindme to update ubuntu at 12.10 am";
 	echo "    remindme To drink coffee after 5 minutes";
 }
@@ -57,7 +57,7 @@ input=$*;
 
 if [[ ($* == "" || $* == "-h" || $* == "--help") ]]; then
 	usage;
-	exit 1;
+	exit 0;
 fi
 
 # String containing both at and after then take last at or after for time
