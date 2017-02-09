@@ -39,7 +39,7 @@ EOF
 		echo usage;
 		exit 0;
 	}
-	echo "Keep working... I will remind you "$input;
+	echo -e "\u2714 Keep working... I will remind you "$input; # \u2714 --> unicode for Check Symbol
 	exit 0;	
 }
 
